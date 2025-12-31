@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy New Year — For You</title>
+  <style>
+    :root{
+      --bg1:#0f0c29; --bg2:#302b63; --accent:#ff6b81;
+      --card-bg: rgba(255,255,255,0.06);
+      --glass: rgba(255,255,255,0.06);
+    }
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(255,90,120,0.08), transparent),
+                  linear-gradient(135deg,var(--bg1),var(--bg2));
+      display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff
+    }
+    .stage{position:relative;width:100%;height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+    .card{
+      width:100%;max-width:720px;background:linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border-radius:20px;padding:28px;backdrop-filter: blur(6px);box-shadow:0 10px 40px rgba(0,0,0,0.6);position:relative;overflow:hidden
+    }
+    .center{position:relative;z-index:5;display:flex;flex-direction:column;gap:18px;align-items:center;text-align:center}
+    .title{font-size:28px;font-weight:800;letter-spacing:0.4px;background:linear-gradient(90deg,#ffd1dc,#ff79a8);-webkit-background-clip:text;color:transparent}
+    .msg{font-size:18px;font-weight:700;line-height:1.4;max-width:640px}
+    .msg strong{display:block;font-size:20px;color:#fff}
+    .heart-cta{margin-top:6px;font-size:22px}
+
+    /* messages box */
+    .messages{height:120px;display:flex;align-items:center;justify-content:center}
+    .message{position:absolute;opacity:0;transform:translateY(10px) scale(0.98);transition:all 600ms cubic-bezier(.2,.9,.3,1);padding:12px 18px;border-radius:12px}
+    .message.show{opacity:1;transform:translateY(0) scale(1)}
+
+    /* play button */
+    .play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:8}
+    .play-btn{background:linear-gradient(90deg,#ff6b81,#ff9acb);border:none;padding:14px 22px;border-radius:999px;color:white;font-weight:800;font-size:18px;box-shadow:0 8px 24px rgba(255,110,140,0.28);display:flex;gap:12px;align-items:center;cursor:pointer}
+    .play-btn:active{transform:translateY(2px)}
+
+    /* particle container */
+    .particles{position:absolute;inset:0;pointer-events:none;z-index:3}
+    .particle{position:absolute;top:-10vh;will-change:transform,opacity;animation-name:fall,wiggle;animation-timing-function:linear, ease-in-out;}
+    .particle.heart{font-size:28px;text-shadow:0 0 10px rgba(255,120,150,0.9);filter:drop-shadow(0 0 16px rgba(255,90,130,0.45));}
+    .particle.flower{font-size:20px;text-shadow:0 0 10px rgba(255,220,120,0.9);filter:drop-shadow(0 0 14px rgba(255,200,80,0.3));}
+
+    @keyframes fall{from{transform:translateY(-10vh) translateX(0) rotate(0)} to{transform:translateY(110vh) translateX(30px) rotate(360deg)}}
+    @keyframes wiggle{0%{transform:translateX(0)}50%{transform:translateX(-10px)}100%{transform:translateX(0)}}
+
+    /* small responsiveness */
+    @media(max-width:520px){.card{padding:18px;border-radius:16px}.title{font-size:22px}.msg{font-size:16px}.message{padding:10px}}
+
+    /* subtle sparkles */
+    .spark{position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03) 0 2px, transparent 10%), radial-gradient(circle at 80% 70%, rgba(255,255,255,0.02) 0 2px, transparent 12%);mix-blend-mode:screen;opacity:0.9}
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="card" id="card">
+      <div class="center">
+        <div class="title">Happy New Year, my love</div>
+        <div class="messages" id="messages"></div>
+        <div class="heart-cta msg">❤️ <span style="font-weight:900; color:#ffd1dc;">With you, 2026 will be unforgettable.</span></div>
+      </div>
+
+      <div class="particles" id="particles"></div>
+      <div class="spark"></div>
+
+      <div class="play-overlay" id="overlay">
+        <button class="play-btn" id="playBtn">Tap to Play Music & Start ❤️</button>
+      </div>
+
+      <audio id="bgm" src="song.mp3" loop preload="auto"></audio>
+    </div>
+  </div>
+
+  <script>
+    // Messages from you — bold, styled, will cycle
+    const messages = [
+      "Happy New Year, my love — here’s to a year of new memories together. ❤️",
+      "To my amazing girlfriend: may 2026 bring you as much joy as you bring me.",
+      "Every day with you is my favorite — can’t wait for more in 2026.",
+      "You make my life brighter — cheers to us in the New Year!",
+      "With you by my side, 2026 will be unforgettable. Love you!",
+      "Wishing you all the love and happiness — I’m yours always.",
+      "I love you so much my golu molu dombi chusni love u forever want to live with u whole life time babyyyyyy ❤️❤️‍🩹😘😘😘🥺🙈😽💋"
+    ];
+
+    const messagesRoot = document.getElementById('messages');
+    let idx = 0;
+
+    function showMessage(i){
+      messagesRoot.innerHTML = '';
+      const m = document.createElement('div');
+      m.className = 'message show';
+      m.innerHTML = '<strong style="font-size:18px; color:#fff">' + messages[i] + '</strong>';
+      messagesRoot.appendChild(m);
+    }
+
+    showMessage(0);
+    setInterval(()=>{ idx = (idx+1) % messages.length; showMessage(idx); }, 4000);
+
+    // Particles (hearts and flowers) falling from top
+    const particlesRoot = document.getElementById('particles');
+    const particleEmojis = { heart: '❤️', flower: '🌸' };
+
+    function spawnParticle(){
+      const p = document.createElement('div');
+      const type = Math.random() < 0.6 ? 'heart' : 'flower';
+      p.className = 'particle ' + type;
+      p.innerText = particleEmojis[type];
+
+      const left = Math.random() * 100; // vw
+      const size = 14 + Math.random()*28; // px
+      p.style.left = left + 'vw';
+      p.style.fontSize = size + 'px';
+
+      const duration = 6 + Math.random()*8; // seconds
+      const delay = Math.random()*2;
+      p.style.animationDuration = duration + 's, ' + (2 + Math.random()*2) + 's';
+      p.style.opacity = 0.9 - Math.random()*0.5;
+
+      particlesRoot.appendChild(p);
+
+      // remove after animation
+      setTimeout(()=>{ p.remove(); }, (duration + 0.5)*1000 + delay*1000);
+    }
+
+    let particleInterval = null;
+    function startParticles(){
+      if(particleInterval) return;
+      spawnParticle();
+      particleInterval = setInterval(spawnParticle, 420);
+    }
+
+    function stopParticles(){
+      clearInterval(particleInterval); particleInterval=null;
+    }
+
+    // Audio & play button handling
+    const playBtn = document.getElementById('playBtn');
+    const overlay = document.getElementById('overlay');
+    const bgm = document.getElementById('bgm');
+
+    function startAll(){
+      // try to play audio; some mobiles require user gesture
+      bgm.play().catch(()=>{});
+      overlay.style.display = 'none';
+      startParticles();
+    }
+
+    playBtn.addEventListener('click', ()=>{
+      startAll();
+    });
+
+    // Try autoplay politely: many browsers block audible autoplay
+    window.addEventListener('load', ()=>{
+      const tryPlay = bgm.play();
+      if(tryPlay !== undefined){
+        tryPlay.then(()=>{ overlay.style.display = 'none'; startParticles(); }).catch(()=>{ overlay.style.display = 'flex'; });
+      }
+    });
+
+    // Accessibility: allow pause/play on double-tap of card
+    const card = document.getElementById('card');
+    let lastTap = 0;
+    card.addEventListener('touchend', (e)=>{
+      const now = Date.now(); if(now - lastTap < 400){ // double tap
+        if(bgm.paused){ bgm.play(); startParticles(); overlay.style.display='none'} else { bgm.pause(); stopParticles(); overlay.style.display='flex'}
+      }
+      lastTap = now;
+    });
+  </script>
+</body>
+</html>
